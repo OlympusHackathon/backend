@@ -1,9 +1,7 @@
 import requests
 
-# Make a GET request
 response = requests.get('https://developer.atlassian.com/server/crowd/json-requests-and-responses/')
 
-# Check if the request was successful (status code 200)
 if response.status_code == 200:
     try:
         # Parse the JSON response
