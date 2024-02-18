@@ -4,8 +4,10 @@ from sumy.summarizers.lsa import LsaSummarizer
 
 # Input text to be summarized
 def summarize(input_text):
+    finalSummary = ""
     parser = PlaintextParser.from_string(input_text, Tokenizer("english"))
     summarizer = LsaSummarizer()
     summary = summarizer(parser.document, sentences_count=10)
     for sentence in summary:
-        print(sentence)
+        finalSummary += sentence + "\n"
+    return finalSummary
