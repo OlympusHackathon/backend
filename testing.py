@@ -1,6 +1,8 @@
 import fitz
-
-doc = fitz.open('dbms_design.pdf')
+import os
+from ml import summarize
+document = os.path.join('/Users/sabrinababakulova/Desktop/hackathon/backend/', 'dbms_design.pdf')
+doc = fitz.open(document)
 current_state = ""
 text_range = []
 minima_font_size = 15
@@ -10,7 +12,6 @@ for page_number in range(len(doc)):
     if len(blocks) == 0:
         continue
     for b in blocks:
-        print(b)
         for l in b["lines"]:
             for s in l["spans"]:
                 if "chapter" in s["text"].lower() and s["size"] >= minima_font_size:
@@ -27,4 +28,8 @@ for page_number in range(len(doc)):
                 else:
                     if len(text_range) != 0:
                             text_range[-1]["info"] += s["text"]
-print(text_range[0]['info'])
+
+def get_chapter_info():
+    for i in range(3):
+        summarize(text_range[i]['info'])
+get_chapter_info()
