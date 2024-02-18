@@ -1,36 +1,22 @@
-import spacy
-from spacy.lang.en.stop_words import STOP_WORDS
-from string import punctuation
-from heapq import nlargest
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
 
-def summarize(text, per):
-    nlp = spacy.load('en_core_web_sm')
-    doc= nlp(text)
-    tokens=[token.text for token in doc]
-    word_frequencies={}
-    for word in doc:
-        if word.text.lower() not in list(STOP_WORDS):
-            if word.text.lower() not in punctuation:
-                if word.text not in word_frequencies.keys():
-                    word_frequencies[word.text] = 1
-                else:
-                    word_frequencies[word.text] += 1
-    max_frequency=max(word_frequencies.values())
-    for word in word_frequencies.keys():
-        word_frequencies[word]=word_frequencies[word]/max_frequency
-    sentence_tokens= [sent for sent in doc.sents]
-    sentence_scores = {}
-    for sent in sentence_tokens:
-        for word in sent:
-            if word.text.lower() in word_frequencies.keys():
-                if sent not in sentence_scores.keys():                            
-                    sentence_scores[sent]=word_frequencies[word.text.lower()]
-                else:
-                    sentence_scores[sent]+=word_frequencies[word.text.lower()]
-    select_length=int(len(sentence_tokens)*per)
-    summary=nlargest(select_length, sentence_scores,key=sentence_scores.get)
-    final_summary=[word.text for word in summary]
-    summary=''.join(final_summary)
-    return summary
+# Input text to be summarized
+input_text = "Abstractive text summarization creates readable sentences from the complete text input. Large volumes of text are rewritten by producing acceptable representations, which are then analyzed and summarized using natural language processing. What distinguishes this technology is its almost AI-like capacity to parse text utilizing a machine’s semantic capabilities and iron out wrinkles using NLP. Although it is not as straightforward to utilize as the extractive technique, abstract summary is significantly more beneficial in many cases. In many ways, it is a forerunner to full-fledged AI authoring tools. This is not to say that extractive summarization is unnecessary. As the name implies, extractive text summarizing ‘extracts’ significant information from enormous amounts of text and arranges it into clear and succinct summaries. The approach is simple in that it extracts texts based on factors such the text to be summarized, the most essential sentences (Top K), and the importance of each of these phrases to the overall subject. This, however, implies that the approach is constrained to specified parameters, which might lead to biased retrieved text under certain scenarios. Extractive text summarizing is the most often utilized approach by automated text summarizers due to its simplicity in most use scenarios."
 
-summarize("We’ll use SpaCy to import a pre-trained NLP pipeline to help interpret the grammatical structure of the text. This will allow us to identify the most common words that are often useful to filter out (i.e. STOP_WORDS) as well as the punctuation (i.e. punctuation). We’ll also use the nlargest function to extract a percentage of the most important sentences. Our algorithm will use the following steps:", 0.05)
+# Parse the input text
+parser = PlaintextParser.from_string(input_text, Tokenizer("english"))
+
+# Create an LSA summarizer
+summarizer = LsaSummarizer()
+
+# Generate the summary
+summary = summarizer(parser.document, sentences_count=3)  # You can adjust the number of sentences in the summary
+
+# Output the summary
+print("Original Text:")
+print(input_text)
+print("\nSummary:")
+for sentence in summary:
+    print(sentence)
